@@ -28,6 +28,10 @@ private:
 	std::unique_ptr<Player> m_pPlayer;
 	std::vector<std::unique_ptr<Enemy>> m_enemies;
 	std::unique_ptr<Fireball> m_fireball;
+
+	// Instruction text shown at beginning of play for a few seconds
+	std::unique_ptr<sf::Text> m_pText;
+	float m_instructionTimeRemaining = 0.0f;
 	
 	sf::RectangleShape m_ground;
 	bool m_hasPauseKeyBeenReleased = true;

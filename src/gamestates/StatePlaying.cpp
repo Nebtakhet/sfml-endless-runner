@@ -25,6 +25,23 @@ bool StatePlaying::init()
 
 	m_pPlayer->setPosition(sf::Vector2f(200, Entity::getGroundY()));
 
+	// Instruction text: show for a few seconds at the start of the playing state
+	{
+		const sf::Font* pFont = ResourceManager::getOrLoadFont("Lavigne.ttf");
+		if (pFont != nullptr)
+		{
+			m_pText = std::make_unique<sf::Text>(*pFont);
+			if (m_pText)
+			{
+				m_pText->setString("MOVE: ARROWS / WASD   |   FIRE: SPACE (HOLD TO CHARGE)");
+				m_pText->setStyle(sf::Text::Bold);
+				sf::FloatRect localBounds = m_pText->getLocalBounds();
+				m_pText->setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
+				m_instructionTimeRemaining = 5.0f; // seconds
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -104,6 +121,14 @@ void StatePlaying::update(float dt)
 	}
 
 	updateCollisions();
+
+	// Instruction timer: decrement and clamp
+	if (m_instructionTimeRemaining > 0.0f)
+	{
+		m_instructionTimeRemaining -= dt;
+		if (m_instructionTimeRemaining < 0.0f)
+			m_instructionTimeRemaining = 0.0f;
+	}
 }
 
 void StatePlaying::updateCollisions()
@@ -162,6 +187,17 @@ void StatePlaying::render(sf::RenderTarget& target) const
 	if (m_fireball)
 		m_fireball->render(target);
 	m_pPlayer->render(target);
+
+	// Draw instruction text for the first few seconds
+	if (m_instructionTimeRemaining > 0.0f && m_pText)
+	{
+		sf::Text txt = *m_pText;
+		sf::FloatRect localBounds = txt.getLocalBounds();
+		txt.setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
+		auto viewSize = target.getView().getSize();
+		txt.setPosition(sf::Vector2f(viewSize.x / 2.0f, viewSize.y / 5.0f));
+		target.draw(txt);
+	}
 }
 
 void StatePlaying::handleEvent(const sf::Event& event)
