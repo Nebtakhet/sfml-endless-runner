@@ -12,7 +12,7 @@ Player::Player()
 
 bool Player::init()
 {
-    const sf::Texture* pTexture = ResourceManager::getOrLoadTexture("caveman.png");
+    const sf::Texture* pTexture = ResourceManager::getOrLoadTexture("sorceress.png");
     if (pTexture == nullptr)
         return false;
 

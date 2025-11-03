@@ -37,7 +37,7 @@ class Player final : public Entity
 		int frameRow = 2;
 		int currentCol = 0;
 		int currentRow = 0;
-		float frameTime = 0.3f; // Time per frame in seconds
+		float frameTime = 0.1f; // Time per frame in seconds
 		float animationTimer = 0.0f;
 		bool facingRight = true;
 
