@@ -20,7 +20,7 @@ bool Enemy::init()
 	m_pSprite->setScale(sf::Vector2f(2.5f, 2.5f));
 	m_collisionRadius = collisionRadius;
 
-	setHealth(3);
+	setHealth(6);
 
 	return true;
 }

@@ -2,6 +2,7 @@
 #include "StatePaused.h"
 #include "StateStack.h"
 #include "ResourceManager.h"
+#include "../entities/Orb.h"
 #include <memory>
 #include <iostream>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -122,6 +123,10 @@ void StatePlaying::update(float dt)
 		pEnemy->update(dt);
 	}
 
+	// Update orbs
+	for (const std::unique_ptr<Orb>& o : m_orbs)
+		o->update(dt);
+
 	updateCollisions();
 
 	// Instruction timer: decrement and clamp
@@ -166,9 +171,18 @@ void StatePlaying::updateCollisions()
 				bool died = pEnemy->takeDamage(m_fireball->getDamage());
 				m_fireball->kill();
 				if (died)
+				{
+					// spawn an orb at the enemy position
+					auto orb = std::make_unique<Orb>();
+					orb->setPosition(pEnemy->getPosition());
+					if (orb->init())
+						m_orbs.push_back(std::move(orb));
 					it = m_enemies.erase(it);
+				}
 				else
+				{
 					++it;
+				}
 				break; // fireball consumed
 			}
 			else
@@ -179,6 +193,31 @@ void StatePlaying::updateCollisions()
 		if (m_fireball && !m_fireball->isAlive())
 			m_fireball.reset();
 	}
+
+		// Player vs orb collisions
+		for (auto it = m_orbs.begin(); it != m_orbs.end(); )
+		{
+			const std::unique_ptr<Orb>& o = *it;
+			if (!o->isAlive())
+			{
+				it = m_orbs.erase(it);
+				continue;
+			}
+
+			float distance = (m_pPlayer->getPosition() - o->getPosition()).lengthSquared();
+			float minDistance = std::pow(Player::collisionRadius + o->getCollisionRadius(), 2.0f);
+			if (distance <= minDistance)
+			{
+				// collected
+				++m_orbsCollected;
+				o->collect();
+				it = m_orbs.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 }
 
 void StatePlaying::render(sf::RenderTarget& target) const
@@ -186,6 +225,10 @@ void StatePlaying::render(sf::RenderTarget& target) const
 	target.draw(m_ground);
 	for (const std::unique_ptr<Enemy>& pEnemy : m_enemies)
 		pEnemy->render(target);
+
+	// draw orbs
+	for (const std::unique_ptr<Orb>& o : m_orbs)
+		o->render(target);
 	if (m_fireball)
 		m_fireball->render(target);
 	m_pPlayer->render(target);

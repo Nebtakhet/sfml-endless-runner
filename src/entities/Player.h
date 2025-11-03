@@ -6,6 +6,7 @@
 #include <SFML/System/Angle.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+
 namespace sf { class Sprite; }
 namespace sf { class Event; }
 class Fireball;

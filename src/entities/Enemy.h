@@ -20,10 +20,4 @@ public:
 	void update(float dt) override;
 	void render(sf::RenderTarget& target) const override;
 	
-	// Health (HP) so levels can configure enemy durability
-	int getHealth() const { return m_health; }
-	void setHealth(int hp) { m_health = hp; }
-
-private:
-	int m_health = 3;
 };

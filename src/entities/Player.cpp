@@ -4,6 +4,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <cmath>
+#include <iostream>
 #include <SFML/Window/Event.hpp>
 
 Player::Player()
@@ -166,19 +167,14 @@ std::unique_ptr<Fireball> Player::releaseFireball()
 
 	m_fireRequested = false;
 
-	// If no charge accumulated, don't fire
-	if (m_charge <= 0.0f)
-		return nullptr;
-
-	// Map charge time to damage
+	// Determine damage based on charge. It scales linearly from 1 to m_maxDamage.
 	float t = m_charge / m_maxChargeTime;
-
 	if (t < 0.f)
 		t = 0.f;
 	if (t > 1.f)
 		t = 1.f;
 
-	int damage = std::max(1, static_cast<int>(std::round(t * m_maxDamage)));
+	int damage = 1 + static_cast<int>(std::floor(t * (m_maxDamage - 1)));
 
 	// Speed scales with damage
 	float baseSpeed = 300.0f;

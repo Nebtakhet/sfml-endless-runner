@@ -4,6 +4,7 @@
 #include "entities/Player.h"
 #include "entities/Enemy.h"
 #include "entities/Fireball.h"
+#include "entities/Orb.h"
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -27,7 +28,10 @@ private:
 	StateStack &m_stateStack;
 	std::unique_ptr<Player> m_pPlayer;
 	std::vector<std::unique_ptr<Enemy>> m_enemies;
+	std::vector<std::unique_ptr<Orb>> m_orbs;
 	std::unique_ptr<Fireball> m_fireball;
+
+	int m_orbsCollected = 0;
 
 	// Instruction text shown at beginning of play for a few seconds
 	std::unique_ptr<sf::Text> m_pText;
