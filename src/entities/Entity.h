@@ -12,6 +12,12 @@ public:
     Entity() = default;
     Entity(const sf::Vector2f& position, const sf::Angle& rotation);
 
+    // Global ground Y coordinate (pixels). All entities can reference this
+    // so ground-related logic is consistent. Default matches previous hardcoded value.
+    static inline float groundY = 800.0f;
+    static void setGroundY(float y) { groundY = y; }
+    static float getGroundY() { return groundY; }
+
     virtual bool init() = 0;
     virtual void update(float dt) = 0;
     virtual void render(sf::RenderTarget& target) const = 0;

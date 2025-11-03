@@ -38,7 +38,6 @@ private:
 	bool m_alive = true;
 	int m_bounces = 0;
 	int m_maxBounces = 3;
-	float m_groundY = 800.0f;
 
 	// When true the fireball is attached to the player and growing in damage
 	bool m_charging = false;

@@ -48,9 +48,9 @@ void Fireball::update(float dt)
 	m_position += m_velocity * dt;
 
 	// Ground interaction (simple bounce)
-	if (m_position.y >= m_groundY)
+	if (m_position.y >= Entity::getGroundY())
 	{
-		m_position.y = m_groundY;
+		m_position.y = Entity::getGroundY();
 		if (m_bounces < m_maxBounces)
 		{
 			m_velocity.y = -m_velocity.y * 0.6f;

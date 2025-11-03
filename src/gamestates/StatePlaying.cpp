@@ -16,14 +16,14 @@ StatePlaying::StatePlaying(StateStack& stateStack)
 bool StatePlaying::init()
 {
     m_ground.setSize({1024.0f, 256.0f});
-    m_ground.setPosition({0.0f, 800.0f});
+    m_ground.setPosition({0.0f, Entity::getGroundY()});
     m_ground.setFillColor(sf::Color::Green);
 
     m_pPlayer = std::make_unique<Player>();
     if (!m_pPlayer || !m_pPlayer->init())
         return false;
 
-    m_pPlayer->setPosition(sf::Vector2f(200, 800));
+    m_pPlayer->setPosition(sf::Vector2f(200, Entity::getGroundY()));
 
     return true;
 }
@@ -36,12 +36,12 @@ void StatePlaying::update(float dt)
     {
         m_timeUntilEnemySpawn = enemySpawnInterval;
         std::unique_ptr<Enemy> pEnemy = std::make_unique<Enemy>();
-        pEnemy->setPosition(sf::Vector2f(1000, 800));
+        pEnemy->setPosition(sf::Vector2f(1000, Entity::getGroundY()));
         if (pEnemy->init())
             m_enemies.push_back(std::move(pEnemy));
     }
 
-    bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape);
+    bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter);
     m_hasPauseKeyBeenReleased |= !isPauseKeyPressed;
     if (m_hasPauseKeyBeenReleased && isPauseKeyPressed)
     {

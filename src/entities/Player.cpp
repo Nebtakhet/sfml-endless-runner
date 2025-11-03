@@ -90,7 +90,9 @@ void Player::update(float dt)
 
     // world bounds and ground collision
     const float worldWidth = 1024.0f;
-    const float groundY = 775.0f;
+    // Player sprite baseline offset: original code used 775 while ground rect was 800.
+    // Keep the same visual alignment by applying a small offset from Entity::groundY.
+    const float groundY = Entity::getGroundY() - 25.0f;
 
     if (m_pSprite)
     {

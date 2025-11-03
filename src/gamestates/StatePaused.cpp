@@ -23,7 +23,7 @@ bool StatePaused::init()
     if (!m_pText)
         return false;
 
-    m_pText->setString("PRESS <ESC> TO UNPAUSE");
+    m_pText->setString("PRESS <ENTER> TO UNPAUSE");
     m_pText->setStyle(sf::Text::Bold);
     sf::FloatRect localBounds = m_pText->getLocalBounds();
     m_pText->setOrigin({localBounds.size.x / 2.0f, localBounds.size.y / 2.0f});
@@ -34,7 +34,7 @@ bool StatePaused::init()
 void StatePaused::update(float dt)
 {
     (void)dt;
-    bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape);
+    bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter);
     m_hasPauseKeyBeenReleased |= !isPauseKeyPressed;
     if (m_hasPauseKeyBeenReleased && isPauseKeyPressed)
         m_stateStack.popDeferred();
