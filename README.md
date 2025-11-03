@@ -65,7 +65,37 @@ Upload your work to Google Drive, Dropbox (or some other service), and complete 
 
 ## Your Game's Instructions
 
-Please include any instructions to your game here.
+Game: "Runes of Fire"
+
+You play as the Sorceress. Your goal is to defeat the final Boss.
+
+Objective
+- Defeat enemies to collect Orbs. Each defeated enemy drops an Orb.
+- When you have 10 Orbs, you can invoke the Boss. Defeat the Boss to win.
+
+Controls
+- Move: Left / Right arrows or A / D
+- Jump: Up arrow or W
+- Charge Fireball: Hold Space
+- Release Fireball: Release Space (damage and speed scale with charge)
+- Invoke Boss: Press F when you have 10/10 Orbs
+
+Gameplay notes
+- Enemies move from right to left. Shoot them with charged Fireballs to kill them and collect Orbs.
+- The Fireball's damage and speed increase with how long you hold Space. Release to fire.
+- When you have 10 Orbs a prompt appears. Press F to start a short countdown and summon the Boss.
+
+HUD and feedback
+- The top-center HUD shows "Orbs: X/10". When it reaches 10/10 a prompt appears to invoke the Boss.
+- On Boss defeat the game shows a large "YOU WIN!" message and returns to the menu after a short delay.
+
+Tips
+- Charge your shot for tougher enemies and the Boss — higher charge deals more damage and travels faster.
+- Keep moving: enemies approach from the right and faster enemies will appear as you progress.
+- Watch the Boss' hit area (it may be slightly smaller than the sprite); tune your shots accordingly.
+
+
+
 
 ## Troubleshooting
 
