@@ -26,7 +26,7 @@ bool StatePaused::init()
 	m_pText->setString("PRESS <ENTER> TO UNPAUSE");
 	m_pText->setStyle(sf::Text::Bold);
 	sf::FloatRect localBounds = m_pText->getLocalBounds();
-	m_pText->setOrigin({localBounds.size.x / 2.0f, localBounds.size.y / 2.0f});
+	m_pText->setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
 
 	return true;
 }
@@ -45,6 +45,6 @@ void StatePaused::render(sf::RenderTarget& target) const
 	if (m_pPrevState != nullptr)
 		m_pPrevState->render(target);
 
-	m_pText->setPosition({target.getSize().x * 0.5f, target.getSize().y * 0.2f});
+	m_pText->setPosition(sf::Vector2f(target.getSize().x * 0.5f, target.getSize().y * 0.2f));
 	target.draw(*m_pText);
 }

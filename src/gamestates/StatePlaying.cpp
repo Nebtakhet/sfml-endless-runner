@@ -8,6 +8,9 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Event.hpp>
 #include <cmath>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <algorithm>
 
 StatePlaying::StatePlaying(StateStack& stateStack)
 	: m_stateStack(stateStack)
@@ -27,6 +30,8 @@ bool StatePlaying::init()
 		return false;
 
 	m_pPlayer->setPosition(sf::Vector2f(200, Entity::getGroundY()));
+
+	// (previously used OrbCounter; HUD will be rendered directly in StatePlaying)
 
 	// Instruction text: show for a few seconds at the start of the playing state
 	{
@@ -236,12 +241,38 @@ void StatePlaying::render(sf::RenderTarget& target) const
 	// Draw instruction text for the first few seconds
 	if (m_instructionTimeRemaining > 0.0f && m_pText)
 	{
-		sf::Text txt = *m_pText;
-		sf::FloatRect localBounds = txt.getLocalBounds();
-		txt.setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
+	sf::Text txt = *m_pText;
+	sf::FloatRect localBounds = txt.getLocalBounds();
+	txt.setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
 		auto viewSize = target.getView().getSize();
 		txt.setPosition(sf::Vector2f(viewSize.x / 2.0f, viewSize.y / 5.0f));
 		target.draw(txt);
+	}
+
+	// Simple centered counter at the top: "Orb: X/10"
+	{
+		const sf::Font* pFont = ResourceManager::getOrLoadFont("Lavigne.ttf");
+		if (pFont)
+		{
+			int displayCount = std::min(m_orbsCollected, 10);
+			std::string hudString = "Orbs: " + std::to_string(displayCount) + "/10";
+
+			sf::Text hudText(*pFont, hudString);
+			hudText.setCharacterSize(20);
+			hudText.setStyle(sf::Text::Bold);
+			hudText.setFillColor(sf::Color::White);
+			hudText.setOutlineColor(sf::Color::Black);
+			hudText.setOutlineThickness(1.0f);
+
+			// center horizontally at top
+			sf::Vector2f viewSize = target.getView().getSize();
+			sf::FloatRect tb = hudText.getLocalBounds();
+			float centerX = viewSize.x * 0.5f;
+			float y = 12.0f + hudText.getCharacterSize() * 0.5f;
+			hudText.setOrigin(sf::Vector2f(tb.size.x / 2.0f + tb.position.x, tb.size.y / 2.0f + tb.position.y));
+			hudText.setPosition(sf::Vector2f(centerX, y));
+			target.draw(hudText);
+		}
 	}
 }
 
