@@ -19,6 +19,8 @@ bool StatePlaying::init()
 	m_ground.setPosition({0.0f, Entity::getGroundY()});
 	m_ground.setFillColor(sf::Color::Green);
 
+	(void)ResourceManager::getOrLoadTexture("fireball.png"); // Preload fireball texture
+
 	m_pPlayer = std::make_unique<Player>();
 	if (!m_pPlayer || !m_pPlayer->init())
 		return false;
@@ -37,7 +39,7 @@ bool StatePlaying::init()
 				m_pText->setStyle(sf::Text::Bold);
 				sf::FloatRect localBounds = m_pText->getLocalBounds();
 				m_pText->setOrigin(sf::Vector2f(localBounds.size.x / 2.0f, localBounds.size.y / 2.0f));
-				m_instructionTimeRemaining = 5.0f; // seconds
+				m_instructionTimeRemaining = 7.5f; // seconds
 			}
 		}
 	}
