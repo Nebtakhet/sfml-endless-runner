@@ -12,25 +12,28 @@
 class StatePlaying : public IState
 {
 public:
-    StatePlaying(StateStack& stateStack);
-    ~StatePlaying() = default;
+	StatePlaying(StateStack& stateStack);
+	~StatePlaying() = default;
 
-    bool init() override;
-    void update(float dt) override;
-    void render(sf::RenderTarget& target) const override;
-    void handleEvent(const sf::Event& event) override;
+	bool init() override;
+	void update(float dt) override;
+	void render(sf::RenderTarget& target) const override;
+	void handleEvent(const sf::Event& event) override;
 
 private:
-    static constexpr const float enemySpawnInterval = 2.0f;
-    float m_timeUntilEnemySpawn = enemySpawnInterval;
+	static constexpr const float enemySpawnInterval = 2.0f;
+	float m_timeUntilEnemySpawn = enemySpawnInterval;
 
-    StateStack& m_stateStack;
-    std::unique_ptr<Player> m_pPlayer;
-    std::vector<std::unique_ptr<Enemy>> m_enemies;
-    std::unique_ptr<Fireball> m_fireball;
-    float m_fireChargeTime = 0.0f;
-    sf::RectangleShape m_ground;
-    bool m_hasPauseKeyBeenReleased = true;
+	StateStack &m_stateStack;
+	std::unique_ptr<Player> m_pPlayer;
+	std::vector<std::unique_ptr<Enemy>> m_enemies;
+	std::unique_ptr<Fireball> m_fireball;
+	
+	sf::RectangleShape m_ground;
+	bool m_hasPauseKeyBeenReleased = true;
 
-    void updateCollisions();
+	float m_fireChargeTime = 0.0f;
+
+
+	void updateCollisions();
 };

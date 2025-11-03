@@ -12,6 +12,7 @@ Fireball::Fireball(const sf::Vector2f& pos, const sf::Vector2f& direction, float
 	m_damage = damage;
 	m_velocity = m_direction * m_speed;
 	m_collisionRadius = 12.0f;
+
 	// Increase lifetime slightly based on damage: each damage point adds 0.05s
 	m_lifetime += static_cast<float>(m_damage) * 0.05f;
 }
@@ -40,8 +41,8 @@ bool Fireball::init()
 
 void Fireball::update(float dt)
 {
-    // advance rotation
-    m_rotation += sf::degrees(m_angularSpeedDeg * dt);
+	// advance rotation
+	m_rotation += sf::degrees(m_angularSpeedDeg * dt);
 
 	// Apply gravity
 	m_velocity.y += m_gravity * dt;

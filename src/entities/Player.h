@@ -24,11 +24,9 @@ class Player final : public Entity
 
 		void handleEvent(const sf::Event& event);
 
-		// Query facing direction
-		bool isFacingRight() const { return facingRight; }
+		bool isFacingRight() const { return facingRight; } // Boolean indicating if the player is facing right
 
-		// Release a charged fireball if requested (returns nullptr when none)
-		std::unique_ptr<Fireball> releaseFireball();
+		std::unique_ptr<Fireball> releaseFireball(); // Releases a charged fireball if requested
 
 	private:
 	
@@ -65,7 +63,7 @@ class Player final : public Entity
 	// Fire/charge state
 		bool m_fireRequested = false;
 		float m_charge = 0.0f; // accumulated charge time in seconds
-		float m_maxChargeTime = 1.5f; // clamp for charge
+		float m_maxChargeTime = 3.0f; // clamp for charge
 		int m_maxDamage = 10; // max damage from a fully charged shot
 
 };
