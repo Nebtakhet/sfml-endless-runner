@@ -31,7 +31,7 @@ private:
 	sf::Vector2f m_direction;
 	sf::Vector2f m_velocity;
 	float m_speed = 0.0f;
-	float m_lifetime = 5.0f; // seconds
+	float m_lifetime = 0.5f; // seconds
 	float m_gravity = 400.0f; // pixel/s^2 (match Player gravity scale)
 
 	int m_damage = 0;

@@ -57,10 +57,16 @@ void StatePlaying::update(float dt)
         auto newFb = m_pPlayer->releaseFireball();
         if (newFb)
         {
-            // ensure it's treated as an active projectile
-            newFb->setCharging(false);
-            m_fireChargeTime = 0.0f;
-            m_fireball = std::move(newFb);
+            // Only accept a new fireball if we don't already have one active.
+            // If a fireball is already present, discard the newly created one
+            // so the player cannot fire again until the existing projectile is gone.
+            if (!m_fireball)
+            {
+                // ensure it's treated as an active projectile
+                newFb->setCharging(false);
+                m_fireChargeTime = 0.0f;
+                m_fireball = std::move(newFb);
+            }
         }
     }
 

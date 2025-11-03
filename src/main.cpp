@@ -2,6 +2,7 @@
 #include "gamestates/StateStack.h"
 #include "gamestates/IState.h"
 #include "gamestates/StateMenu.h"
+#include "gamestates/StatePaused.h"
 #include <memory>
 #include <stack>
 #include <optional>
@@ -31,14 +32,26 @@ int main(int argc, char* argv[])
         IState* pState = gamestates.getCurrentState();
         if (!pState) return -1;
 
-        while (const std::optional event = window.pollEvent())
+        while (auto optEvent = window.pollEvent())
         {
-            if (event->is<sf::Event::Closed>() || (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
+            const sf::Event &event = *optEvent;
+
+            if (event.is<sf::Event::Closed>() || (event.is<sf::Event::KeyPressed>()
+				&& event.getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
             {
                 return 0;
             }
+
+            if (event.is<sf::Event::FocusLost>())
+            {
+                // Pause the game when the window loses focus, but only if not already paused
+                IState* currentState = gamestates.getCurrentState();
+                if (!(currentState && dynamic_cast<StatePaused*>(currentState)))
+                    gamestates.push<StatePaused>();
+            }
+
             // Sends the event to the current state for handling
-            pState->handleEvent(*event);
+            pState->handleEvent(event);
         }
 
         pState->update(elapsedTime.asSeconds());
