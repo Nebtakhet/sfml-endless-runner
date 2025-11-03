@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
+#include <SFML/Audio/Sound.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -17,12 +18,25 @@ int main(int argc, char* argv[])
     // ResourceManager must be instantiated here -- DO NOT CHANGE
     ResourceManager::init(argv[0]);
 
-    sf::RenderWindow window(sf::VideoMode({1024, 1024}), "Runs of Fire");
+    sf::RenderWindow window(sf::VideoMode({1024, 1024}), "Runes of Fire");
     window.setKeyRepeatEnabled(false);
 
     StateStack gamestates;
     if (!gamestates.push<StateMenu>())
         return -1;
+
+    // Create a persistent background sound (looping) so the audio is not
+    // constructed and played every frame. If the buffer isn't available we
+    // simply skip background audio.
+    std::unique_ptr<sf::Sound> pBackgroundSound;
+    if (const sf::SoundBuffer* pBuf = ResourceManager::getOrLoadSoundBuffer("Gore.mp3"))
+    {
+        pBackgroundSound = std::make_unique<sf::Sound>(*pBuf);
+        // Some SFML builds in this project may not expose a setLooping API on sf::Sound.
+        // Instead, ensure the sound is started now and, during the main loop, restart it
+        // if it ever stops (simple manual looping).
+        pBackgroundSound->play();
+    }
 
     sf::Clock clock;
     while (window.isOpen())
@@ -55,6 +69,9 @@ int main(int argc, char* argv[])
         }
 
         pState->update(elapsedTime.asSeconds());
+        // Manually loop background sound if needed (fallback for SFML builds without setLooping)
+        if (pBackgroundSound && pBackgroundSound->getStatus() == sf::SoundSource::Status::Stopped)
+            pBackgroundSound->play();
         window.clear(sf::Color::Blue);
         pState->render(window);
         window.display();
