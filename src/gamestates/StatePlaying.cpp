@@ -1,21 +1,30 @@
 #include "StatePlaying.h"
 #include "StatePaused.h"
+#include "StateMenu.h"
 #include "StateStack.h"
+
 #include "ResourceManager.h"
-#include "../entities/Orb.h"
-#include <memory>
-#include <iostream>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <cmath>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
 #include <algorithm>
+#include <iostream>
+
+#include "../entities/Player.h"
+#include "../entities/Enemy.h"
+#include "../entities/Fireball.h"
+#include "../entities/Orb.h"
+#include "../entities/Boss.h"
+
 
 StatePlaying::StatePlaying(StateStack& stateStack)
 	: m_stateStack(stateStack)
 {
 }
+
+StatePlaying::~StatePlaying() = default;
 
 bool StatePlaying::init()
 {
@@ -31,7 +40,6 @@ bool StatePlaying::init()
 
 	m_pPlayer->setPosition(sf::Vector2f(200, Entity::getGroundY()));
 
-	// (previously used OrbCounter; HUD will be rendered directly in StatePlaying)
 
 	// Instruction text: show for a few seconds at the start of the playing state
 	{
@@ -55,15 +63,43 @@ bool StatePlaying::init()
 
 void StatePlaying::update(float dt)
 {
+	// If we're showing the win screen, count down and then return to menu
+	if (m_showWinTimer > 0.0f)
+	{
+		m_showWinTimer -= dt;
+		if (m_showWinTimer <= 0.0f)
+		{
+			m_showWinTimer = 0.0f;
+			m_showWin = false;
+			// End this playing state and go back to the menu
+			m_stateStack.popDeferred();
+			m_stateStack.push<StateMenu>();
+		}
+		// while showing win, freeze game logic (but still render)
+		return;
+	}
+
 	m_timeUntilEnemySpawn -= dt;
+
+	// Spawn enemies. When a boss is being invoked, make enemies come slightly faster and move faster
+	float spawnInterval = enemySpawnInterval;
+	float enemyBaseSpeed = 200.0f;
+	if (m_bossInvoked)
+	{
+		spawnInterval = enemySpawnInterval * 0.95f;
+		enemyBaseSpeed *= 1.05f; 
+	}
 
 	if (m_timeUntilEnemySpawn < 0.0f)
 	{
-		m_timeUntilEnemySpawn = enemySpawnInterval;
+		m_timeUntilEnemySpawn = spawnInterval;
 		std::unique_ptr<Enemy> pEnemy = std::make_unique<Enemy>();
 		pEnemy->setPosition(sf::Vector2f(1000, Entity::getGroundY()));
 		if (pEnemy->init())
+		{
+			pEnemy->setSpeed(enemyBaseSpeed);
 			m_enemies.push_back(std::move(pEnemy));
+		}
 	}
 
 	bool isPauseKeyPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter);
@@ -75,6 +111,23 @@ void StatePlaying::update(float dt)
 	}
 
 	m_pPlayer->update(dt);
+
+	// If boss has been invoked, count down to spawn
+	if (m_bossInvoked)
+	{
+		if (m_bossTimer > 0.0f)
+		{
+			m_bossTimer -= dt;
+			if (m_bossTimer <= 0.0f && !m_boss)
+			{
+				// spawn boss near right side above ground
+				auto boss = std::make_unique<Boss>();
+				boss->setPosition(sf::Vector2f(1000.0f, Entity::getGroundY() - 100.0f));
+				if (boss->init())
+					m_boss = std::move(boss);
+			}
+		}
+	}
 
 	// If the player charged a shot and released, initiate a new fireball
 	if (m_pPlayer)
@@ -123,10 +176,15 @@ void StatePlaying::update(float dt)
 			m_fireball.reset();
 	}
 
+
 	for (const std::unique_ptr<Enemy>& pEnemy : m_enemies)
 	{
 		pEnemy->update(dt);
 	}
+
+	// Update boss if present
+	if (m_boss)
+		m_boss->update(dt);
 
 	// Update orbs
 	for (const std::unique_ptr<Orb>& o : m_orbs)
@@ -199,6 +257,29 @@ void StatePlaying::updateCollisions()
 			m_fireball.reset();
 	}
 
+	// Fireball vs boss collisions
+	if (m_fireball && m_boss)
+	{
+		float distance = (m_fireball->getPosition() - m_boss->getPosition()).lengthSquared();
+		float minDistance = std::pow(m_fireball->getCollisionRadius() + m_boss->getCollisionRadius(), 2.0f);
+		if (distance <= minDistance)
+		{
+			bool died = m_boss->takeDamage(m_fireball->getDamage());
+			m_fireball->kill();
+			if (died)
+			{
+				// boss died: remove it and start win timer to show 'YOU WIN!'
+				m_boss.reset();
+				m_showWin = true;
+				m_showWinTimer = 3.0f; // show for 3 seconds
+				std::cout << "Boss defeated! YOU WIN!" << std::endl;
+			}
+			// consume fireball whether boss died or not
+			if (m_fireball && !m_fireball->isAlive())
+				m_fireball.reset();
+		}
+	}
+
 		// Player vs orb collisions
 		for (auto it = m_orbs.begin(); it != m_orbs.end(); )
 		{
@@ -213,9 +294,9 @@ void StatePlaying::updateCollisions()
 			float minDistance = std::pow(Player::collisionRadius + o->getCollisionRadius(), 2.0f);
 			if (distance <= minDistance)
 			{
-				// collected
-				++m_orbsCollected;
-				o->collect();
+					if (m_orbsCollected < 10)
+						++m_orbsCollected;
+					o->collect();
 				it = m_orbs.erase(it);
 			}
 			else
@@ -238,8 +319,12 @@ void StatePlaying::render(sf::RenderTarget& target) const
 		m_fireball->render(target);
 	m_pPlayer->render(target);
 
+	// Render boss if present
+	if (m_boss)
+		m_boss->render(target);
+
 	// Draw instruction text for the first few seconds
-	if (m_instructionTimeRemaining > 0.0f && m_pText)
+    if (m_instructionTimeRemaining > 0.0f && m_pText)
 	{
 	sf::Text txt = *m_pText;
 	sf::FloatRect localBounds = txt.getLocalBounds();
@@ -247,6 +332,26 @@ void StatePlaying::render(sf::RenderTarget& target) const
 		auto viewSize = target.getView().getSize();
 		txt.setPosition(sf::Vector2f(viewSize.x / 2.0f, viewSize.y / 5.0f));
 		target.draw(txt);
+	}
+
+	// If showing win message, draw it on top
+	if (m_showWinTimer > 0.0f)
+	{
+		const sf::Font* pFont = ResourceManager::getOrLoadFont("Lavigne.ttf");
+		if (pFont)
+		{
+			std::string winStr = "YOU WIN!";
+			sf::Text winText(*pFont, winStr, 96);
+			winText.setStyle(sf::Text::Bold);
+			winText.setFillColor(sf::Color::Yellow);
+			winText.setOutlineColor(sf::Color::Black);
+			winText.setOutlineThickness(4.0f);
+			sf::FloatRect wb = winText.getLocalBounds();
+			winText.setOrigin(sf::Vector2f(wb.size.x / 2.0f, wb.size.y / 2.0f));
+			sf::Vector2f viewSize = target.getView().getSize();
+			winText.setPosition(sf::Vector2f(viewSize.x * 0.5f, viewSize.y * 0.5f));
+			target.draw(winText);
+		}
 	}
 
 	// Simple centered counter at the top: "Orb: X/10"
@@ -257,21 +362,37 @@ void StatePlaying::render(sf::RenderTarget& target) const
 			int displayCount = std::min(m_orbsCollected, 10);
 			std::string hudString = "Orbs: " + std::to_string(displayCount) + "/10";
 
-			sf::Text hudText(*pFont, hudString);
+			sf::Text hudText(*pFont, hudString, 20);
 			hudText.setCharacterSize(20);
 			hudText.setStyle(sf::Text::Bold);
 			hudText.setFillColor(sf::Color::White);
 			hudText.setOutlineColor(sf::Color::Black);
 			hudText.setOutlineThickness(1.0f);
 
-			// center horizontally at top
 			sf::Vector2f viewSize = target.getView().getSize();
 			sf::FloatRect tb = hudText.getLocalBounds();
 			float centerX = viewSize.x * 0.5f;
 			float y = 12.0f + hudText.getCharacterSize() * 0.5f;
-			hudText.setOrigin(sf::Vector2f(tb.size.x / 2.0f + tb.position.x, tb.size.y / 2.0f + tb.position.y));
+			hudText.setOrigin(sf::Vector2f(tb.size.x / 2.0f, tb.size.y / 2.0f));
 			hudText.setPosition(sf::Vector2f(centerX, y));
 			target.draw(hudText);
+
+			// If we've collected the maximum orbs and haven't invoked the boss yet, show a larger centered prompt
+			if (displayCount >= 10 && !m_bossInvoked)
+			{
+				std::string promptStr = "Press 'F' to invoke Boss";
+				sf::Text prompt(*pFont, promptStr, 36);
+				prompt.setStyle(sf::Text::Bold);
+				prompt.setFillColor(sf::Color::White);
+				prompt.setOutlineColor(sf::Color::Black);
+				prompt.setOutlineThickness(2.0f);
+
+				sf::FloatRect pb = prompt.getLocalBounds();
+				prompt.setOrigin(sf::Vector2f(pb.size.x / 2.0f, pb.size.y / 2.0f));
+				sf::Vector2f viewSize = target.getView().getSize();
+				prompt.setPosition(sf::Vector2f(viewSize.x * 0.5f, viewSize.y * 0.5f));
+				target.draw(prompt);
+			}
 		}
 	}
 }
@@ -280,4 +401,20 @@ void StatePlaying::handleEvent(const sf::Event& event)
 {
 	if (m_pPlayer)
 		m_pPlayer->handleEvent(event);
+
+	// Handle boss invocation
+	if (event.is<sf::Event::KeyPressed>())
+	{
+		if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
+		{
+			if (kp->code == sf::Keyboard::Key::F)
+			{
+				if (!m_bossInvoked && m_orbsCollected >= 10)
+				{
+					m_bossInvoked = true;
+					m_bossTimer = 1.5f; // seconds until boss spawns
+				}
+			}
+		}
+	}
 }

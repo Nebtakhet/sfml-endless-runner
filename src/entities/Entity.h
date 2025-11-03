@@ -22,7 +22,6 @@ public:
 	virtual void render(sf::RenderTarget& target) const = 0;
 
 	// Apply damage to this entity. Returns true if the entity died (health <= 0).
-	// Can be overridden by derived classes (e.g., bosses with special behavior).
 	virtual bool takeDamage(int dmg)
 	{
 		m_health -= dmg;

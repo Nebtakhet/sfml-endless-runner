@@ -5,6 +5,10 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+
+StateMenu::~StateMenu() = default;
 
 StateMenu::StateMenu(StateStack& stateStack)
 	: m_stateStack(stateStack)

@@ -1,8 +1,7 @@
 #include "Enemy.h"
 #include "ResourceManager.h"
-#include <cmath>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+
 
 bool Enemy::init()
 {
@@ -20,14 +19,24 @@ bool Enemy::init()
 	m_pSprite->setScale(sf::Vector2f(2.5f, 2.5f));
 	m_collisionRadius = collisionRadius;
 
-	setHealth(6);
+	setHealth(3);
 
 	return true;
 }
 
 void Enemy::update(float dt)
 {
-	m_position.x -= 200 * dt;
+	m_position.x -= m_speed * dt;
+}
+
+void Enemy::setSpeed(float s)
+{
+	m_speed = s;
+}
+
+float Enemy::getSpeed() const
+{
+	return m_speed;
 }
 
 void Enemy::render(sf::RenderTarget& target) const

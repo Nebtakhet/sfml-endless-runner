@@ -2,11 +2,9 @@
 
 #include "Entity.h"
 #include <memory>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/Graphics/Sprite.hpp>
 
-namespace sf { class Sprite; }
+// forward-declare SFML types used by reference/pointer in headers
+namespace sf { class Sprite; class RenderTarget; }
 
 class Enemy final : public Entity
 {
@@ -20,4 +18,10 @@ public:
 	void update(float dt) override;
 	void render(sf::RenderTarget& target) const override;
 	
+	// Set movement speed (pixels per second). Default is 200.
+	void setSpeed(float s);
+	float getSpeed() const;
+
+private:
+	float m_speed = 200.0f;
 };

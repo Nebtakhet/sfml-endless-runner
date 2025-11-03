@@ -6,7 +6,7 @@ bool Orb::init()
 {
     const float radius = 12.0f;
     m_shape.setRadius(radius);
-    m_shape.setFillColor(sf::Color(255, 215, 0, 215)); // gold/yellow for visibility
+    m_shape.setFillColor(sf::Color(255, 215, 0, 215)); // gold/yellow for visibility, semi-transparent
     m_shape.setOrigin({radius, radius});
     m_collisionRadius = radius;
     m_age = 0.0f;

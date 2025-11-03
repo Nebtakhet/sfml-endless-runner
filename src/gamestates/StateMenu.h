@@ -9,7 +9,7 @@ class StateMenu : public IState
 {
 public:
 	StateMenu(StateStack& stateStack);
-	~StateMenu() = default;
+	~StateMenu();
 
 	bool init() override;
 	void update(float dt) override;

@@ -17,14 +17,14 @@ public:
 	bool isAlive() const { return m_alive; }
 	void kill() { m_alive = false; }
 
-	// Charging API used by StatePlaying
+	// Charging API
 	bool isCharging() const { return m_charging; }
 	void setCharging(bool c) { m_charging = c; }
 
 	// Allow damage to be adjusted while charging
 	void setDamage(int dmg) { m_damage = dmg; }
 
-	// Configure angular speed (degrees per second)
+	// Configure angular speed
 	void setAngularSpeed(float degPerSec) { m_angularSpeedDeg = degPerSec; }
 
 private:
@@ -32,14 +32,14 @@ private:
 	sf::Vector2f m_velocity;
 	float m_speed = 0.0f;
 	float m_lifetime = 0.3f; // seconds
-	float m_gravity = 400.0f; // pixel/s^2 (match Player gravity scale)
+	float m_gravity = 400.0f;
 
 	int m_damage = 0;
 	bool m_alive = true;
 	int m_bounces = 0;
 	int m_maxBounces = 3;
 
-	// When true the fireball is attached to the player and growing in damage
+	// When true, the fireball is attached to the player and growing in damage
 	bool m_charging = false;
 
 	// Rotation speed in degrees per second
