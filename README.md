@@ -104,5 +104,6 @@ If you are using a multi-config generator (for example Visual Studio), run the b
 This project was developed from a starter codebase provided during a Supercell gameplay programming challenge.
 
 - The original starter framework and any challenge-provided content remain the property of their respective owners.
+- Background music used in this project is the track `Gore.mp3` by Marshall Anderson for the game *Soldat* and is not my original work.
 - My contribution in this repository is the gameplay implementation and extension work built on top of that base.
 - This repository is shared for portfolio and learning purposes.
