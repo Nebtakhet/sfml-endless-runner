@@ -1,43 +1,82 @@
 # Runes of Fire
 
-### 2D Endless Runner (C++ / SFML)
+### 🔥 2D Endless Runner (C++ / SFML)
 
 Runes of Fire is a 2D endless runner where you control a sorceress, survive waves of enemies, collect orbs, and invoke a final boss fight.
 
 This repository is part of my gameplay programming portfolio and focuses on core gameplay systems, combat, collision handling, and state-driven game flow.
 
-## Quick Facts
+## ✨ Quick Facts
 
-- **Language:** C++17
-- **Graphics/Audio:** SFML 3
-- **Build system:** CMake 3.22.1+
-- **Executable name:** `runner`
+- 💻 **Language:** C++17
+- 🎮 **Graphics/Audio:** SFML 3
+- 🛠️ **Build system:** CMake 3.22.1+
+- 🚀 **Executable name:** `runner`
 
 ---
 
-## Gameplay Highlights
+## 🎯 Gameplay Highlights
 
-- Endless enemy pressure with timed spawning
-- Movement model with acceleration, friction, jump physics, and bounds
-- Charged fireball combat (`hold Space` to charge, `release` to fire)
-- Orb-based progression (collect `10/10` orbs to unlock boss summon)
-- Boss encounter with health-based defeat condition
-- HUD feedback for orb count, summon prompt, and win state
+- 👾 Endless enemy pressure with timed spawning
+- 🏃 Movement model with acceleration, friction, jump physics, and bounds
+- 🔥 Charged fireball combat (`hold Space` to charge, `release` to fire)
+- 🟣 Orb-based progression (collect `10/10` orbs to unlock boss summon)
+- 🧟 Boss encounter with health-based defeat condition
+- 🧭 HUD feedback for orb count, summon prompt, and win state
 
-## Systems Implemented
+## ⚙️ Systems Implemented
 
-- Input pipeline for movement, jump, attack charge/release, pause, and boss invocation
-- Collision systems:
+- 🎮 Input pipeline for movement, jump, attack charge/release, pause, and boss invocation
+- 💥 Collision systems:
   - player ↔ enemy (death condition)
   - fireball ↔ enemy (damage/kill + orb drop)
   - player ↔ orb (collection)
   - fireball ↔ boss (damage/defeat + win flow)
-- Entity lifecycle updates for player, enemies, projectiles, orbs, and boss
-- Game-state architecture (`Menu`, `Playing`, `Paused`)
+- 🔁 Entity lifecycle updates for player, enemies, projectiles, orbs, and boss
+- 🧱 Game-state architecture (`Menu`, `Playing`, `Paused`)
+
+## 🏗️ Visual Architecture
+
+```mermaid
+flowchart TD
+    A[main.cpp] --> B[StateStack]
+    B --> C[StateMenu]
+    B --> D[StatePlaying]
+    B --> E[StatePaused]
+
+    D --> F[Player]
+    D --> G[Enemy]
+    D --> H[Fireball]
+    D --> I[Orb]
+    D --> J[Boss]
+    D --> K[ResourceManager]
+
+    L[CMakeLists.txt] --> M[runner]
+    M --> N[build/bin/assets]
+```
+
+```text
+src/
+├── main.cpp
+├── ResourceManager.h / ResourceManager.cpp
+├── entities/
+│   ├── Entity
+│   ├── Player
+│   ├── Enemy
+│   ├── Fireball
+│   ├── Orb
+│   └── Boss
+└── gamestates/
+    ├── IState
+    ├── StateMenu
+    ├── StatePlaying
+    ├── StatePaused
+    └── StateStack
+```
 
 
 
-## Installation & Run
+## 🧰 Installation & Run
 
 ### 1) Requirements
 
@@ -83,7 +122,7 @@ If you are using a multi-config generator (for example Visual Studio), run the b
 ---
 
 
-## Controls
+## 🎮 Controls
 
 | Key | Action |
 |---|---|
@@ -98,12 +137,12 @@ If you are using a multi-config generator (for example Visual Studio), run the b
 ---
 
 
-## Project Notes
+## 📝 Project Notes
 
 - Assets are copied automatically into the executable output directory after build.
 - Music, textures, and fonts are loaded through the resource manager layer.
 
-## Attribution & Ownership
+## 📄 Attribution & Ownership
 
 This project was developed from a starter codebase provided during a Supercell gameplay programming challenge.
 
