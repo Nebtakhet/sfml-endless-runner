@@ -33,11 +33,13 @@ private:
 	std::vector<std::unique_ptr<Enemy>> m_enemies;
 	std::vector<std::unique_ptr<Orb>> m_orbs;
 	std::unique_ptr<Fireball> m_fireball;
+	std::vector<std::unique_ptr<Fireball>> m_bossFireballs;
 
 	// Boss invocation state
 	std::unique_ptr<Boss> m_boss;
 	bool m_bossInvoked = false;
 	float m_bossTimer = 0.0f; // countdown until boss spawns when invoked
+	float m_bossFireballTimer = 0.0f;
 
 	int m_orbsCollected = 0;
 

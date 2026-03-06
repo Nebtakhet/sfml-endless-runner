@@ -16,6 +16,7 @@ public:
 	int getDamage() const { return m_damage; }
 	bool isAlive() const { return m_alive; }
 	void kill() { m_alive = false; }
+	void addLifetime(float seconds) { m_lifetime += seconds; }
 
 	// Charging API
 	bool isCharging() const { return m_charging; }

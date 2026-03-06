@@ -124,7 +124,10 @@ void StatePlaying::update(float dt)
 				auto boss = std::make_unique<Boss>();
 				boss->setPosition(sf::Vector2f(1000.0f, Entity::getGroundY() - 100.0f));
 				if (boss->init())
+				{
 					m_boss = std::move(boss);
+					m_bossFireballTimer = 0.2f;
+				}
 			}
 		}
 	}
@@ -184,7 +187,35 @@ void StatePlaying::update(float dt)
 
 	// Update boss if present
 	if (m_boss)
+	{
 		m_boss->update(dt);
+
+		// Boss throws fireballs to the left
+		m_bossFireballTimer -= dt;
+		if (m_bossFireballTimer <= 0.0f)
+		{
+			m_bossFireballTimer = 1.2f;
+			sf::Vector2f fireDir(-1.0f, -0.2f);
+			float lenSq = fireDir.lengthSquared();
+			if (lenSq > 0.0001f)
+				fireDir /= std::sqrt(lenSq);
+
+			sf::Vector2f spawnPos = m_boss->getPosition() + sf::Vector2f(-(m_boss->getCollisionRadius() + 12.0f), -16.0f);
+			auto bossFireball = std::make_unique<Fireball>(spawnPos, fireDir, 260.0f, 4);
+			bossFireball->addLifetime(4.0f);
+			if (bossFireball->init())
+				m_bossFireballs.push_back(std::move(bossFireball));
+		}
+	}
+
+	for (auto it = m_bossFireballs.begin(); it != m_bossFireballs.end(); )
+	{
+		(*it)->update(dt);
+		if (!(*it)->isAlive())
+			it = m_bossFireballs.erase(it);
+		else
+			++it;
+	}
 
 	// Update orbs
 	for (const std::unique_ptr<Orb>& o : m_orbs)
@@ -210,6 +241,17 @@ void StatePlaying::updateCollisions()
 		float distance = (m_pPlayer->getPosition() - pEnemy->getPosition()).lengthSquared();
 		float minDistance = std::pow(Player::collisionRadius + pEnemy->getCollisionRadius(), 2.0f);
 
+		if (distance <= minDistance)
+		{
+			playerDied = true;
+			break;
+		}
+	}
+
+	for (const std::unique_ptr<Fireball>& fb : m_bossFireballs)
+	{
+		float distance = (m_pPlayer->getPosition() - fb->getPosition()).lengthSquared();
+		float minDistance = std::pow(Player::collisionRadius + fb->getCollisionRadius(), 2.0f);
 		if (distance <= minDistance)
 		{
 			playerDied = true;
@@ -270,6 +312,7 @@ void StatePlaying::updateCollisions()
 			{
 				// boss died: remove it and start win timer to show 'YOU WIN!'
 				m_boss.reset();
+				m_bossFireballs.clear();
 				m_showWin = true;
 				m_showWinTimer = 3.0f; // show for 3 seconds
 				std::cout << "Boss defeated! YOU WIN!" << std::endl;
@@ -322,6 +365,9 @@ void StatePlaying::render(sf::RenderTarget& target) const
 	// Render boss if present
 	if (m_boss)
 		m_boss->render(target);
+
+	for (const std::unique_ptr<Fireball>& fb : m_bossFireballs)
+		fb->render(target);
 
 	// Draw instruction text for the first few seconds
     if (m_instructionTimeRemaining > 0.0f && m_pText)
