@@ -37,24 +37,6 @@ This repository is part of my gameplay programming portfolio and focuses on core
 
 ## 🏗️ Visual Architecture
 
-```mermaid
-flowchart TD
-    A[main.cpp] --> B[StateStack]
-    B --> C[StateMenu]
-    B --> D[StatePlaying]
-    B --> E[StatePaused]
-
-    D --> F[Player]
-    D --> G[Enemy]
-    D --> H[Fireball]
-    D --> I[Orb]
-    D --> J[Boss]
-    D --> K[ResourceManager]
-
-    L[CMakeLists.txt] --> M[runner]
-    M --> N[build/bin/assets]
-```
-
 ```text
 src/
 ├── main.cpp
