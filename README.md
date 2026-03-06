@@ -35,19 +35,7 @@ This repository is part of my gameplay programming portfolio and focuses on core
 - Entity lifecycle updates for player, enemies, projectiles, orbs, and boss
 - Game-state architecture (`Menu`, `Playing`, `Paused`)
 
-## Controls
 
-| Key | Action |
-|---|---|
-| `Left / Right` or `A / D` | Move |
-| `Up` or `W` | Jump |
-| `Space` (hold) | Charge fireball |
-| `Space` (release) | Fire charged projectile |
-| `F` | Invoke boss (when orbs are `10/10`) |
-| `Enter` | Start game / Pause / Unpause |
-| `Esc` | Quit |
-
----
 
 ## Installation & Run
 
@@ -93,6 +81,22 @@ cmake --build build
 If you are using a multi-config generator (for example Visual Studio), run the binary from the matching config folder, e.g. `build/bin/Debug/runner`.
 
 ---
+
+
+## Controls
+
+| Key | Action |
+|---|---|
+| `Left / Right` or `A / D` | Move |
+| `Up` or `W` | Jump |
+| `Space` (hold) | Charge fireball |
+| `Space` (release) | Fire charged projectile |
+| `F` | Invoke boss (when orbs are `10/10`) |
+| `Enter` | Start game / Pause / Unpause |
+| `Esc` | Quit |
+
+---
+
 
 ## Project Notes
 
